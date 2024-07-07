@@ -8,16 +8,33 @@ ENV DEBIAN_FRONTEND="noninteractive" \
     CODE_RELEASE=latest
 
 # 安装运行时依赖
-RUN sudo apt-get update && \
-    sudo apt-get install -y \
-    git \
-    jq \
-    libatomic1 \
-    nano \
-    net-tools \
-    netcat \
-    sudo && \
-    sudo apt-get clean 
+
+# 更新包列表
+RUN sudo apt-get update
+
+# 安装 git
+RUN sudo apt-get install -y git
+
+# 安装 jq
+RUN sudo apt-get install -y jq
+
+# 安装 libatomic1
+RUN sudo apt-get install -y libatomic1
+
+# 安装 nano
+RUN sudo apt-get install -y nano
+
+# 安装 net-tools
+RUN sudo apt-get install -y net-tools
+
+# 安装 netcat
+RUN sudo apt-get install -y netcat
+
+# 安装 sudo
+RUN sudo apt-get install -y sudo
+
+# 清理 apt 缓存
+RUN sudo apt-get clean 
 # 下载并安装 Code-Server
 RUN sudo mkdir -p /app/code-server && \
     cd /app/code-server && \
