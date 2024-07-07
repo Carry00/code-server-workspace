@@ -1,33 +1,36 @@
-name: Build and Push Docker Image
+# 使用 gitpod/workspace-full:latest 作为基础镜像
+FROM gitpod/workspace-full:latest
 
-on:
-  push:
-    paths:
-      - Dockerfile
-    branches:
-      - main
+# 设置环境变量
+ENV DEBIAN_FRONTEND="noninteractive" \
+    USER=gitpod \
+    HOME=/home/gitpod \
+    CODE_RELEASE=latest
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+# 安装运行时依赖
+RUN sudo apt-get update && \
+    sudo apt-get install -y \
+    git \
+    jq \
+    libatomic1 \
+    nano \
+    net-tools \
+    netcat \
+    sudo && \
+    sudo apt-get clean && \
+    sudo rm -rf /var/lib/apt/lists/*
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+# 下载并安装 Code-Server
+RUN sudo mkdir -p /app/code-server && \
+    cd /app/code-server && \
+    sudo curl -fL https://github.com/cdr/code-server/releases/download/${CODE_RELEASE}/code-server-${CODE_RELEASE}-linux-amd64.tar.gz -o code-server.tar.gz && \
+    sudo tar -xzf code-server.tar.gz --strip-components=1 && \
+    sudo rm code-server.tar.gz && \
+    sudo ln -s /app/code-server/bin/code-server /usr/local/bin/code-server
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+# 暴露端口和卷
+EXPOSE 8443
+VOLUME /config
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Build and push Docker images
-        uses: docker/build-push-action@v6.3.0
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: carry00/code-server-workspace:latest
+# 启动 Code-Server
+CMD ["sudo", "code-server", "--bind-addr", "0.0.0.0:8443", "--auth", "none", "/config"]
