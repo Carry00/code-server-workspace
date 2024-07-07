@@ -2,34 +2,46 @@
 FROM --platform=linux/amd64 gitpod/workspace-full:latest
 # 设置环境变量
 ENV DEBIAN_FRONTEND="noninteractive" \
-    CODE_RELEASE="1.92.0"
+    CODE_RELEASE="4.90.3"
 
 # 切换到 root 用户
 USER root
+ARG DEBIAN_FRONTEND="noninteractive"
+ENV HOME="/config"
 
-# 更新包列表并安装依赖
-RUN apt-get update && \
-    apt-get install -y \
+RUN \
+  echo "**** install runtime dependencies ****" && \
+  apt-get update && \
+  apt-get install -y \
     git \
     jq \
     libatomic1 \
     nano \
     net-tools \
-    netcat && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    netcat \
+    sudo && \
+  echo "**** install openvscode-server ****" && \
+  if [ -z ${CODE_RELEASE+x} ]; then \
+    CODE_RELEASE=$(curl -sX GET "https://api.github.com/repos/gitpod-io/openvscode-server/releases/latest" \
+      | awk '/tag_name/{print $4;exit}' FS='[""]' \
+      | sed 's|^openvscode-server-v||'); \
+  fi && \
+  mkdir -p /app/openvscode-server && \
+  curl -o \
+    /tmp/openvscode-server.tar.gz -L \
+    "https://github.com/gitpod-io/openvscode-server/releases/download/openvscode-server-v${CODE_RELEASE}/openvscode-server-v${CODE_RELEASE}-linux-x64.tar.gz" && \
+  tar xf \
+    /tmp/openvscode-server.tar.gz -C \
+    /app/openvscode-server/ --strip-components=1 && \
+  echo "**** clean up ****" && \
+  apt-get clean && \
+  rm -rf \
+    /tmp/* \
+    /var/lib/apt/lists/* \
+    /var/tmp/*
 
-# 下载并安装 Code-Server
-RUN mkdir -p /app/code-server && \
-    cd /app/code-server && \
-    curl -fL https://github.com/cdr/code-server/releases/download/v${CODE_RELEASE}/code-server-${CODE_RELEASE}-linux-amd64.tar.gz -o code-server.tar.gz && \
-    tar -xzf code-server.tar.gz --strip-components=1 && \
-    rm code-server.tar.gz && \
-    ln -s /app/code-server/bin/code-server /usr/local/bin/code-server
+# add local files
+COPY /root /
 
-# 暴露端口和卷
-EXPOSE 8443
-VOLUME /config
-
-# 启动 Code-Server
-CMD ["code-server", "--bind-addr", "0.0.0.0:8443", "--auth", "none", "/config"]
+# ports and volumes
+EXPOSE 3000
