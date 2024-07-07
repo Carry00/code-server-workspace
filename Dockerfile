@@ -17,9 +17,7 @@ RUN sudo apt-get update && \
     net-tools \
     netcat \
     sudo && \
-    sudo apt-get clean && \
-    sudo rm -rf /var/lib/apt/lists/*
-
+    sudo apt-get clean 
 # 下载并安装 Code-Server
 RUN sudo mkdir -p /app/code-server && \
     cd /app/code-server && \
