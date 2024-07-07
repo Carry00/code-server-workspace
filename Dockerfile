@@ -1,6 +1,5 @@
 # 使用 gitpod/workspace-full:latest 作为基础镜像
-FROM gitpod/workspace-full:latest
-
+FROM --platform=linux/amd64 gitpod/workspace-full:latest
 # 设置环境变量
 ENV DEBIAN_FRONTEND="noninteractive" \
     CODE_RELEASE=latest
