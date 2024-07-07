@@ -2,7 +2,7 @@
 FROM --platform=linux/amd64 gitpod/workspace-full:latest
 # 设置环境变量
 ENV DEBIAN_FRONTEND="noninteractive" \
-    CODE_RELEASE="4.90.3"
+    CODE_RELEASE="1.92.0"
 
 # 切换到 root 用户
 USER root
