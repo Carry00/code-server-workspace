@@ -2,7 +2,7 @@
 FROM --platform=linux/amd64 gitpod/workspace-full:latest
 # 设置环境变量
 ENV DEBIAN_FRONTEND="noninteractive" \
-    CODE_RELEASE="v4.90.3"
+    CODE_RELEASE="4.90.3"
 
 # 切换到 root 用户
 USER root
@@ -22,7 +22,7 @@ RUN apt-get update && \
 # 下载并安装 Code-Server
 RUN mkdir -p /app/code-server && \
     cd /app/code-server && \
-    curl -fL https://github.com/cdr/code-server/releases/download/${CODE_RELEASE}/code-server-${CODE_RELEASE}-linux-amd64.tar.gz -o code-server.tar.gz && \
+    curl -fL https://github.com/cdr/code-server/releases/download/v${CODE_RELEASE}/code-server-${CODE_RELEASE}-linux-amd64.tar.gz -o code-server.tar.gz && \
     tar -xzf code-server.tar.gz --strip-components=1 && \
     rm code-server.tar.gz && \
     ln -s /app/code-server/bin/code-server /usr/local/bin/code-server
