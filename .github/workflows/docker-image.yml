@@ -29,4 +29,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: carry00/coder-server-workspace:latest
+          tags: carry00/code-server-workspace:latest
