@@ -5,7 +5,7 @@ FROM gitpod/workspace-full:latest
 ENV DEBIAN_FRONTEND="noninteractive" \
     USER=gitpod \
     HOME=/home/gitpod \
-    CODE_RELEASE=${CODE_RELEASE:-latest}
+    CODE_RELEASE=latest
 
 # 安装运行时依赖
 RUN sudo apt-get update && \
